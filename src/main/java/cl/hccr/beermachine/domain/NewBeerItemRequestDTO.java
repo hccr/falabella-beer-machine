@@ -1,11 +1,6 @@
 package cl.hccr.beermachine.domain;
 
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
-
-@JsonNaming(PropertyNamingStrategy.UpperCamelCaseStrategy.class)
-public class BeerItem {
-
+public class NewBeerItemRequestDTO {
     private int id;
     private String name;
     private String brewery;
@@ -13,10 +8,10 @@ public class BeerItem {
     private double price;
     private String currency;
 
-    public BeerItem() {
+    public NewBeerItemRequestDTO() {
     }
 
-    public BeerItem(int id, String name, String brewery, String country, double price, String currency) {
+    public NewBeerItemRequestDTO(int id, String name, String brewery, String country, double price, String currency) {
         this.id = id;
         this.name = name;
         this.brewery = brewery;
