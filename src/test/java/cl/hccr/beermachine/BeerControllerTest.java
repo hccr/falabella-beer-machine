@@ -61,8 +61,17 @@ public class BeerControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.post("/beers")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(newBeerItemRequest)))
-                .andExpect(status().isCreated());
+            .andExpect(status().isCreated());
     }
 
-    
+    @Test
+    void createNewBeerItem_ShouldReturnBadRequestStatus()throws Exception{
+
+       // NewBeerItemRequestDTO newBeerItemRequest = new NewBeerItemRequestDTO(1,"Golden","Kross","Chile",10.5,"EUR");
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/beers")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(""))
+            .andExpect(status().isBadRequest());
+    }
 }
