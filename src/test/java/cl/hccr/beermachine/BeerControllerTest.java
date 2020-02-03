@@ -4,6 +4,7 @@ import cl.hccr.beermachine.controller.BeerController;
 import cl.hccr.beermachine.domain.BeerItem;
 import cl.hccr.beermachine.domain.NewBeerItemRequestDTO;
 import cl.hccr.beermachine.exceptions.BeerItemNotFoundException;
+import cl.hccr.beermachine.exceptions.IdAlreadyExistException;
 import cl.hccr.beermachine.service.BeerService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -14,6 +15,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -66,12 +68,24 @@ public class BeerControllerTest {
 
     @Test
     void createNewBeerItem_ShouldReturnBadRequestStatus()throws Exception{
-
-       // NewBeerItemRequestDTO newBeerItemRequest = new NewBeerItemRequestDTO(1,"Golden","Kross","Chile",10.5,"EUR");
-
         mockMvc.perform(MockMvcRequestBuilders.post("/beers")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(""))
             .andExpect(status().isBadRequest());
     }
+
+    @Test
+    void createNewBeerItem_ShouldReturnConflictStatus()throws Exception{
+        NewBeerItemRequestDTO newBeerItemRequest = new NewBeerItemRequestDTO(1,"Golden","Kross","Chile",10.5,"EUR");
+
+        given(beerService.createBeerItem(any(NewBeerItemRequestDTO.class))).willThrow(new IdAlreadyExistException());
+
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/beers")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(newBeerItemRequest)))
+                .andExpect(status().isConflict());
+    }
+
+
 }

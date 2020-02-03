@@ -6,5 +6,5 @@ import cl.hccr.beermachine.domain.NewBeerItemRequestDTO;
 public interface BeerService {
     BeerItem getBeerItem(int id);
 
-    void createBeerItem(NewBeerItemRequestDTO newBeerItemRequest);
+    BeerItem createBeerItem(NewBeerItemRequestDTO newBeerItemRequest);
 }

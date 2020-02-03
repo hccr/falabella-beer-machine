@@ -20,12 +20,14 @@ public class BeerController {
     @ResponseStatus(HttpStatus.CREATED)
     public void createBeerItem(@RequestBody NewBeerItemRequestDTO newBeerItemRequestDTO){
         beerService.createBeerItem(newBeerItemRequestDTO);
+
     }
 
 
     @GetMapping("/beers/{id}")
     public BeerItem getBeer(@PathVariable int id){
-       return beerService.getBeerItem(id);
+
+        return beerService.getBeerItem(id);
     }
 
 
