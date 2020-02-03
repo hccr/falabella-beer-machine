@@ -1,20 +1,27 @@
 package cl.hccr.beermachine;
 
 import cl.hccr.beermachine.controller.BeerController;
-import cl.hccr.beermachine.domain.BeerItem;
+import cl.hccr.beermachine.domain.BeerItemDTO;
 import cl.hccr.beermachine.domain.NewBeerItemRequestDTO;
 import cl.hccr.beermachine.exceptions.BeerItemNotFoundException;
 import cl.hccr.beermachine.exceptions.IdAlreadyExistException;
 import cl.hccr.beermachine.service.BeerService;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import java.util.Collections;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -34,7 +41,7 @@ public class BeerControllerTest {
 
     @Test
     void getBeerItem_ShouldReturnBearItem() throws Exception{
-        given(beerService.getBeerItem(1)).willReturn(new BeerItem(1,"Golden","Kross","Chile",10.5,"EUR"));
+        given(beerService.getBeerItem(1)).willReturn(new BeerItemDTO(1,"Golden","Kross","Chile",10.5,"EUR"));
 
         mockMvc.perform(MockMvcRequestBuilders.get("/beers/1"))
                 .andExpect(status().isOk())
@@ -85,6 +92,26 @@ public class BeerControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(newBeerItemRequest)))
                 .andExpect(status().isConflict());
+    }
+
+    @Test
+    void getBeers_ShouldReturnBeersList()throws Exception{
+        given(beerService.getBeers()).willReturn(Collections.singletonList(new BeerItemDTO(1,"Golden","Kross","Chile",10.5,"EUR")));
+
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get("/beers"))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        List<BeerItemDTO> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<List<BeerItemDTO>>() {});
+
+        assertThat(response).isNotEmpty();
+        assertThat(response.get(0).getId()).isEqualTo(1);
+        assertThat(response.get(0).getName()).isEqualTo("Golden");
+        assertThat(response.get(0).getBrewery()).isEqualTo("Kross");
+        assertThat(response.get(0).getCountry()).isEqualTo("Chile");
+        assertThat(response.get(0).getPrice()).isEqualTo(10.5);
+        assertThat(response.get(0).getCurrency()).isEqualTo("EUR");
+
     }
 
 

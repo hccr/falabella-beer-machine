@@ -3,7 +3,8 @@ package cl.hccr.beermachine.domain;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
-public class BeerItem {
+@JsonNaming(PropertyNamingStrategy.UpperCamelCaseStrategy.class)
+public class BeerItemDTO {
 
     private int id;
     private String name;
@@ -12,10 +13,10 @@ public class BeerItem {
     private double price;
     private String currency;
 
-    public BeerItem() {
+    public BeerItemDTO() {
     }
 
-    public BeerItem(int id, String name, String brewery, String country, double price, String currency) {
+    public BeerItemDTO(int id, String name, String brewery, String country, double price, String currency) {
         this.id = id;
         this.name = name;
         this.brewery = brewery;
