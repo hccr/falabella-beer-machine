@@ -24,6 +24,11 @@ public class CurrencyServiceImp implements CurrencyService {
 
     @Override
     public double getConvertionRate(String monedaOrigen, String monedaDestino) {
+        //Dado las limitantes de la capa gratuita de currencylayer.com, solo podemos traer los valores en base a dolar, por lo tanto si
+        //necesitamos convertir desde y hacia monedas distintas de dolar debemos hacer un calculo adicional.
+        //Se solicita el cambio DOLAR a moneda origen y DOLAR a moneda destino, luego se divide moneda destino / moneda origen y se obtiene
+        //la tasa de conversion.
+
 
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(HOST)
                 .path("/live")
@@ -31,7 +36,12 @@ public class CurrencyServiceImp implements CurrencyService {
                 .queryParam("currencies", "USD,"+monedaDestino+","+monedaOrigen);
 
         HttpHeaders headers = new HttpHeaders();
+
+        //Se agrega este header User-Agent ya que al realizar la petición sin este arroja un error Forbidden 403, probablemente sea una
+        //restriccion de la api de currecylayer
+
         headers.set("User-Agent","PostmanRuntime/7.21.0");
+
         HttpEntity<?> request = new HttpEntity<>(headers);
 
         try{
@@ -49,7 +59,7 @@ public class CurrencyServiceImp implements CurrencyService {
 
         return 0;
     }
-
+    //Se crea esta clase para obtener los datos ya mapeados desde el api de currencylayer.com
     static class CurrencyResponse{
 
         private boolean success;
