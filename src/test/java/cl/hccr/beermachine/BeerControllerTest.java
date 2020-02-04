@@ -1,10 +1,12 @@
 package cl.hccr.beermachine;
 
 import cl.hccr.beermachine.controller.BeerController;
+import cl.hccr.beermachine.domain.BeerBoxDTO;
 import cl.hccr.beermachine.domain.BeerItemDTO;
 import cl.hccr.beermachine.domain.NewBeerItemRequestDTO;
 import cl.hccr.beermachine.exceptions.BeerItemNotFoundException;
 import cl.hccr.beermachine.exceptions.IdAlreadyExistException;
+import cl.hccr.beermachine.service.BeerBoxService;
 import cl.hccr.beermachine.service.BeerService;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -35,6 +37,8 @@ public class BeerControllerTest {
 
     @MockBean
     private BeerService beerService;
+    @MockBean
+    private BeerBoxService beerBoxService;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -114,5 +118,33 @@ public class BeerControllerTest {
 
     }
 
+
+    @Test
+    void getBeerItemBoxPrice_ShouldReturnBoxPrice() throws Exception{
+        given(beerBoxService.getBoxPrice(1,"CLP",6))
+                .willReturn(new BeerBoxDTO(6999.0));
+
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get("/beers/1/boxprice")
+                .queryParam("currency","CLP")
+                .queryParam("quantity","6"))
+                .andExpect(status().isOk())
+                .andReturn();
+        BeerBoxDTO beerBoxDTO = objectMapper.readValue(result.getResponse().getContentAsString(),BeerBoxDTO.class);
+        assertThat(beerBoxDTO.getPriceTotal()).isEqualTo(6999.0);
+    }
+
+
+
+    /*
+
+    @Test
+    void getBeerItem_NotFound() throws Exception{
+        given(beerService.getBeerItem(0)).willThrow(new BeerItemNotFoundException());
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/beers/0"))
+                .andExpect(status().isNotFound());
+    }
+
+*/
 
 }
