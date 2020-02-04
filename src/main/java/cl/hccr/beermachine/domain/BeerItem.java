@@ -1,10 +1,12 @@
 package cl.hccr.beermachine.domain;
 
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
+import javax.persistence.Entity;
+import javax.persistence.Id;
+
+@Entity
 public class BeerItem {
-
+    @Id
     private int id;
     private String name;
     private String brewery;

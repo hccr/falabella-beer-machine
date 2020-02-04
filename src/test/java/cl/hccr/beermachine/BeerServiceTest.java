@@ -81,7 +81,7 @@ public class BeerServiceTest {
         given(beerRepository.findAll()).willReturn(Collections.emptyList());
 
         List<BeerItemDTO> beers = beerService.getBeers();
-        assertThat(beers.isEmpty());
+        assertThat(beers.isEmpty()).isEqualTo(true);
     }
 
     @Test
