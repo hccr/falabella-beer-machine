@@ -118,7 +118,6 @@ public class BeerControllerTest {
 
     }
 
-
     @Test
     void getBeerItemBoxPrice_ShouldReturnBoxPrice() throws Exception{
         given(beerBoxService.getBoxPrice(1,"CLP",6))
@@ -133,18 +132,15 @@ public class BeerControllerTest {
         assertThat(beerBoxDTO.getPriceTotal()).isEqualTo(6999.0);
     }
 
-
-
-    /*
-
     @Test
-    void getBeerItem_NotFound() throws Exception{
-        given(beerService.getBeerItem(0)).willThrow(new BeerItemNotFoundException());
+    void getBeerItemBoxPrice_ShouldReturnNotFound() throws Exception{
+        given(beerBoxService.getBoxPrice(0,"CLP",6))
+                .willThrow(new BeerItemNotFoundException());
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/beers/0"))
+        mockMvc.perform(MockMvcRequestBuilders.get("/beers/0/boxprice")
+                .queryParam("currency","CLP")
+                .queryParam("quantity","6"))
                 .andExpect(status().isNotFound());
     }
-
-*/
 
 }
