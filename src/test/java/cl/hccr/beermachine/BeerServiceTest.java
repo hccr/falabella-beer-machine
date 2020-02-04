@@ -3,7 +3,6 @@ package cl.hccr.beermachine;
 import cl.hccr.beermachine.domain.BeerBoxDTO;
 import cl.hccr.beermachine.domain.BeerItem;
 import cl.hccr.beermachine.domain.BeerItemDTO;
-import cl.hccr.beermachine.domain.NewBeerItemRequestDTO;
 import cl.hccr.beermachine.exceptions.BeerItemNotFoundException;
 import cl.hccr.beermachine.exceptions.IdAlreadyExistException;
 import cl.hccr.beermachine.repository.BeerRepository;
@@ -93,7 +92,7 @@ public class BeerServiceTest {
     @Test
     void createBeer_ShouldReturnBeerItemDTO(){
         given(beerRepository.save(any(BeerItem.class))).willReturn(getBeerItem());
-        BeerItemDTO beerItemDTO = beerService.createBeerItem(new NewBeerItemRequestDTO(1,"Golden","Kross","Chile",1.5,"EUR"));
+        BeerItemDTO beerItemDTO = beerService.createBeerItem(new BeerItemDTO(1,"Golden","Kross","Chile",1.5,"EUR"));
         assertThat(beerItemDTO.getId()).isEqualTo(1);
         assertThat(beerItemDTO.getName()).isEqualTo("Golden");
         assertThat(beerItemDTO.getBrewery()).isEqualTo("Kross");
@@ -106,7 +105,7 @@ public class BeerServiceTest {
     void createBeer_ShouldThrowIdAlreadyExistException(){
         given(beerRepository.existsById(1)).willReturn(true);
 
-        assertThrows(IdAlreadyExistException.class,()->beerService.createBeerItem(new NewBeerItemRequestDTO(1,"Golden","Kross","Chile",1.5,"EUR")));
+        assertThrows(IdAlreadyExistException.class,()->beerService.createBeerItem(new BeerItemDTO(1,"Golden","Kross","Chile",1.5,"EUR")));
 
     }
 

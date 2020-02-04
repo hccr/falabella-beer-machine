@@ -3,14 +3,11 @@ package cl.hccr.beermachine;
 import cl.hccr.beermachine.controller.BeerController;
 import cl.hccr.beermachine.domain.BeerBoxDTO;
 import cl.hccr.beermachine.domain.BeerItemDTO;
-import cl.hccr.beermachine.domain.NewBeerItemRequestDTO;
 import cl.hccr.beermachine.exceptions.BeerItemNotFoundException;
 import cl.hccr.beermachine.exceptions.IdAlreadyExistException;
-import cl.hccr.beermachine.service.BeerBoxService;
 import cl.hccr.beermachine.service.BeerService;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -37,8 +34,6 @@ public class BeerControllerTest {
 
     @MockBean
     private BeerService beerService;
-    @MockBean
-    private BeerBoxService beerBoxService;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -69,7 +64,7 @@ public class BeerControllerTest {
     @Test
     void createNewBeerItem_ShouldReturnCreatedStatus()throws Exception{
 
-        NewBeerItemRequestDTO newBeerItemRequest = new NewBeerItemRequestDTO(1,"Golden","Kross","Chile",10.5,"EUR");
+        BeerItemDTO newBeerItemRequest = new BeerItemDTO(1,"Golden","Kross","Chile",10.5,"EUR");
 
         mockMvc.perform(MockMvcRequestBuilders.post("/beers")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -87,9 +82,9 @@ public class BeerControllerTest {
 
     @Test
     void createNewBeerItem_ShouldReturnConflictStatus()throws Exception{
-        NewBeerItemRequestDTO newBeerItemRequest = new NewBeerItemRequestDTO(1,"Golden","Kross","Chile",10.5,"EUR");
+        BeerItemDTO newBeerItemRequest = new BeerItemDTO(1,"Golden","Kross","Chile",10.5,"EUR");
 
-        given(beerService.createBeerItem(any(NewBeerItemRequestDTO.class))).willThrow(new IdAlreadyExistException());
+        given(beerService.createBeerItem(any(BeerItemDTO.class))).willThrow(new IdAlreadyExistException());
 
 
         mockMvc.perform(MockMvcRequestBuilders.post("/beers")
@@ -120,7 +115,7 @@ public class BeerControllerTest {
 
     @Test
     void getBeerItemBoxPrice_ShouldReturnBoxPrice() throws Exception{
-        given(beerBoxService.getBoxPrice(1,"CLP",6))
+        given(beerService.getBoxPrice(1,"CLP",6))
                 .willReturn(new BeerBoxDTO(6999.0));
 
         MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get("/beers/1/boxprice")
@@ -134,7 +129,7 @@ public class BeerControllerTest {
 
     @Test
     void getBeerItemBoxPrice_ShouldReturnNotFound() throws Exception{
-        given(beerBoxService.getBoxPrice(0,"CLP",6))
+        given(beerService.getBoxPrice(0,"CLP",6))
                 .willThrow(new BeerItemNotFoundException());
 
         mockMvc.perform(MockMvcRequestBuilders.get("/beers/0/boxprice")
