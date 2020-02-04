@@ -1,5 +1,6 @@
 package cl.hccr.beermachine.service;
 
+import cl.hccr.beermachine.domain.BeerBoxDTO;
 import cl.hccr.beermachine.domain.BeerItemDTO;
 import cl.hccr.beermachine.domain.NewBeerItemRequestDTO;
 
@@ -11,4 +12,6 @@ public interface BeerService {
     BeerItemDTO createBeerItem(NewBeerItemRequestDTO newBeerItemRequest);
 
     List<BeerItemDTO> getBeers();
+
+    BeerBoxDTO getBoxPrice(int idCerveza, String currency, int quantity);
 }

@@ -1,5 +1,6 @@
 package cl.hccr.beermachine;
 
+import cl.hccr.beermachine.domain.BeerBoxDTO;
 import cl.hccr.beermachine.domain.BeerItem;
 import cl.hccr.beermachine.domain.BeerItemDTO;
 import cl.hccr.beermachine.domain.NewBeerItemRequestDTO;
@@ -8,6 +9,8 @@ import cl.hccr.beermachine.exceptions.IdAlreadyExistException;
 import cl.hccr.beermachine.repository.BeerRepository;
 import cl.hccr.beermachine.service.BeerService;
 import cl.hccr.beermachine.service.BeerServiceImp;
+import cl.hccr.beermachine.service.CurrencyService;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,7 +24,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
@@ -32,11 +35,14 @@ public class BeerServiceTest {
     @Mock
     private BeerRepository beerRepository;
 
+    @Mock
+    private CurrencyService currencyService;
+
     private BeerService beerService;
 
     @BeforeEach
     void setUp(){
-        beerService = new BeerServiceImp(beerRepository);
+        beerService = new BeerServiceImp(beerRepository, currencyService);
     }
 
     @Test
@@ -55,7 +61,7 @@ public class BeerServiceTest {
 
     @Test
     void getBeer_ShouldThrowBeerNotFoundException(){
-        given(beerRepository.findById(1)).willReturn(Optional.empty());
+        given(beerRepository.findById(0)).willReturn(Optional.empty());
 
         assertThrows(BeerItemNotFoundException.class,()->beerService.getBeerItem(0));
 
@@ -103,6 +109,36 @@ public class BeerServiceTest {
         assertThrows(IdAlreadyExistException.class,()->beerService.createBeerItem(new NewBeerItemRequestDTO(1,"Golden","Kross","Chile",1.5,"EUR")));
 
     }
+
+
+
+
+    @Test
+    void getBoxPrice_ShouldThrowBeerItemNotFoundException(){
+        given(beerRepository.findById(0)).willReturn(Optional.empty());
+        assertThrows(BeerItemNotFoundException.class,()->beerService.getBoxPrice(0,"CLP",6));
+    }
+
+    @Test
+    void getBoxPrice_ShouldReturnBoxPriceDetails(){
+        given(beerRepository.findById(1)).willReturn(Optional.of(new BeerItem(1,"Golden","Kross","Chile",1.5,"EUR")));
+        BeerBoxDTO beerBoxDTO = beerService.getBoxPrice(1,"EUR",6);
+        Assertions.assertThat(beerBoxDTO.getPriceTotal()).isEqualTo(6.0*1.5);
+    }
+
+    @Test
+    void getBoxPriceWithDifferentCurrency_ShouldReturnBoxPriceDetails(){
+        given(beerRepository.findById(1)).willReturn(Optional.of(new BeerItem(1,"Golden","Kross","Chile",1.5,"EUR")));
+        given(currencyService.getConvertionRate("EUR","CLP")).willReturn(871.3);
+
+        BeerBoxDTO beerBoxDTO = beerService.getBoxPrice(1,"CLP",6);
+
+
+        Assertions.assertThat(Math.round(beerBoxDTO.getPriceTotal())).isEqualTo(Math.round(6*871.3*1.5));
+    }
+
+
+
 
     private BeerItem getBeerItem(){
         return new BeerItem(1,"Golden","Kross","Chile",1.5,"EUR");
